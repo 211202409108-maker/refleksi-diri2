@@ -1,0 +1,869 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  :root{
+    --bg-a: #F6F9FF;
+    --bg-b: #EFF5FF;
+    --card-bg: #FFFFFF;
+    --blue-pastel: #DCE9FF;
+    --blue-soft: #EEF4FF;
+    --blue-accent: #6C93F5;
+    --blue-accent-dark: #4C74D9;
+    --text-primary: #26304A;
+    --text-secondary: #8A93A8;
+    --text-faint: #B5BDCC;
+    --border: #E6ECF7;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --shadow-card: 0 20px 60px rgba(76,116,217,0.10), 0 4px 14px rgba(38,48,74,0.05);
+    --shadow-soft: 0 8px 24px rgba(76,116,217,0.08);
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--text-primary);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, var(--blue-pastel) 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, var(--blue-soft) 0%, transparent 55%),
+      var(--bg-a);
+  }
+
+  #refl-root{
+    min-height:100vh;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+  }
+
+  .r-blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(60px);
+    opacity:0.55;
+    pointer-events:none;
+    animation:r-float 14s ease-in-out infinite;
+    z-index:0;
+  }
+  .r-blob-1{width:340px;height:340px;background:#CFE0FF;top:-80px;left:-100px;animation-delay:0s;}
+  .r-blob-2{width:280px;height:280px;background:#E4EDFF;bottom:-100px;right:-80px;animation-delay:3s;}
+  @keyframes r-float{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(20px,-16px) scale(1.06);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .r-blob{animation:none;}
+  }
+
+  .r-card{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:600px;
+    background:var(--card-bg);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card);
+    padding:48px 44px;
+    animation:r-fadein 0.55s ease both;
+  }
+  @keyframes r-fadein{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .r-card{animation:none;}
+  }
+
+  @media (max-width:640px){
+    .r-card{padding:32px 24px; border-radius:18px;}
+  }
+
+  /* ---------- Landing ---------- */
+  .r-eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--blue-accent-dark);
+    background:var(--blue-soft);
+    padding:6px 12px;
+    border-radius:100px;
+    margin-bottom:20px;
+  }
+  .r-title{
+    font-size:32px;
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:-0.02em;
+    margin:0 0 20px;
+  }
+  @media (max-width:640px){ .r-title{font-size:26px;} }
+
+  .r-body-text{
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--text-secondary);
+    white-space:pre-line;
+    margin:0 0 16px;
+  }
+  .r-body-text strong{color:var(--text-primary);}
+
+  .r-note{
+    font-size:14px;
+    line-height:1.7;
+    color:var(--text-secondary);
+    background:var(--blue-soft);
+    border-radius:var(--radius-md);
+    padding:16px 18px;
+    margin:24px 0;
+  }
+  .r-note b{color:var(--text-primary);}
+
+  .r-btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:600;
+    font-size:15px;
+    border-radius:100px;
+    padding:14px 28px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  }
+  .r-btn:focus-visible{outline:2px solid var(--blue-accent-dark); outline-offset:3px;}
+  .r-btn-primary{
+    background:linear-gradient(135deg, var(--blue-accent), var(--blue-accent-dark));
+    color:#fff;
+    box-shadow:0 10px 24px rgba(76,116,217,0.28);
+  }
+  .r-btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 30px rgba(76,116,217,0.34);}
+  .r-btn-primary:disabled{opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none;}
+  .r-btn-ghost{
+    background:var(--blue-soft);
+    color:var(--text-primary);
+  }
+  .r-btn-ghost:hover{background:var(--blue-pastel);}
+  .r-btn-ghost:disabled{opacity:0.4; cursor:not-allowed;}
+  .r-btn-row{display:flex; gap:12px; margin-top:28px; justify-content:space-between;}
+  .r-btn-row .r-btn{flex:1;}
+
+  .r-landing-footer{
+    margin-top:32px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    text-align:center;
+  }
+  .r-admin-link{
+    font-size:12px;
+    color:var(--text-faint);
+    text-decoration:none;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .r-admin-link:hover{color:var(--text-secondary);}
+
+  /* ---------- Survey ---------- */
+  .r-progress-wrap{margin-bottom:28px;}
+  .r-progress-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--blue-accent-dark);
+    margin-bottom:10px;
+  }
+  .r-progress-track{
+    height:6px;
+    background:var(--blue-soft);
+    border-radius:100px;
+    overflow:hidden;
+  }
+  .r-progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--blue-accent), var(--blue-accent-dark));
+    border-radius:100px;
+    transition:width 0.4s ease;
+  }
+
+  .r-q-wrap{animation:r-qfade 0.35s ease both;}
+  @keyframes r-qfade{
+    from{opacity:0; transform:translateX(8px);}
+    to{opacity:1; transform:translateX(0);}
+  }
+  @media (prefers-reduced-motion: reduce){ .r-q-wrap{animation:none;} }
+
+  .r-q-title{
+    font-size:20px;
+    font-weight:700;
+    line-height:1.5;
+    margin:0 0 20px;
+    letter-spacing:-0.01em;
+  }
+
+  .r-textarea{
+    width:100%;
+    min-height:170px;
+    resize:vertical;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:16px 18px;
+    font-family:inherit;
+    font-size:15px;
+    line-height:1.65;
+    color:var(--text-primary);
+    background:#FBFCFF;
+    transition:border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .r-textarea::placeholder{color:var(--text-faint);}
+  .r-textarea:focus{
+    outline:none;
+    border-color:var(--blue-accent);
+    box-shadow:0 0 0 4px rgba(108,147,245,0.14);
+    background:#fff;
+  }
+
+  .r-hint{font-size:12.5px; color:var(--text-faint); margin-top:8px;}
+
+  /* ---------- Thank you ---------- */
+  .r-thanks-icon{font-size:38px; margin-bottom:18px;}
+  .r-quote{
+    font-size:15px;
+    font-style:italic;
+    color:var(--blue-accent-dark);
+    background:var(--blue-soft);
+    border-left:3px solid var(--blue-accent);
+    padding:14px 18px;
+    border-radius:0 var(--radius-md) var(--radius-md) 0;
+    margin:20px 0;
+  }
+
+  /* ---------- Admin ---------- */
+  .r-admin-card{max-width:960px;}
+  .r-admin-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .r-admin-title{font-size:22px; font-weight:800; margin:0;}
+  .r-admin-sub{font-size:13px; color:var(--text-secondary); margin-top:4px;}
+
+  .r-toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+  }
+  .r-search{
+    flex:1;
+    min-width:180px;
+    border:1.5px solid var(--border);
+    border-radius:100px;
+    padding:11px 18px;
+    font-family:inherit;
+    font-size:14px;
+    background:#FBFCFF;
+  }
+  .r-search:focus{outline:none; border-color:var(--blue-accent); box-shadow:0 0 0 4px rgba(108,147,245,0.14);}
+  .r-btn-sm{padding:10px 18px; font-size:13.5px;}
+
+  .r-response-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    max-height:520px;
+    overflow-y:auto;
+    padding-right:4px;
+    margin-bottom:24px;
+  }
+  .r-response-card{
+    background:var(--blue-soft);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    border:1px solid var(--border);
+  }
+  .r-response-meta{
+    font-size:12px;
+    color:var(--text-faint);
+    font-weight:600;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .r-response-qa{margin-bottom:10px;}
+  .r-response-qa:last-child{margin-bottom:0;}
+  .r-response-q{font-size:12.5px; font-weight:700; color:var(--blue-accent-dark); margin-bottom:3px;}
+  .r-response-a{font-size:14px; line-height:1.6; color:var(--text-primary); white-space:pre-line;}
+  .r-empty{
+    text-align:center;
+    color:var(--text-faint);
+    font-size:14px;
+    padding:40px 20px;
+  }
+
+  .r-ai-box{
+    background:linear-gradient(135deg, #F3F7FF, #EDF3FF);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:20px 22px;
+    margin-top:18px;
+    font-size:14.5px;
+    line-height:1.75;
+    white-space:pre-line;
+    color:var(--text-primary);
+  }
+  .r-ai-box.r-loading{color:var(--text-secondary); font-style:italic;}
+
+  .r-back-link{
+    font-size:13px;
+    color:var(--text-secondary);
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:18px;
+    padding:0;
+  }
+  .r-back-link:hover{color:var(--text-primary);}
+
+  .r-pw-row{display:flex; gap:10px; margin-top:20px;}
+  .r-pw-row input{
+    flex:1;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:13px 16px;
+    font-family:inherit;
+    font-size:14.5px;
+    background:#FBFCFF;
+  }
+  .r-pw-row input:focus{outline:none; border-color:var(--blue-accent); box-shadow:0 0 0 4px rgba(108,147,245,0.14);}
+  .r-error{color:#D9534F; font-size:13px; margin-top:10px;}
+</style>
+
+<div id="refl-root">
+  <div class="r-blob r-blob-1"></div>
+  <div class="r-blob r-blob-2"></div>
+  <div id="refl-view"></div>
+</div>
+
+<script>
+(function(){
+
+  // ---------- Config ----------
+  // NOTE: this is a lightweight client-side gate, not real authentication.
+  // Change this before sharing the admin link with anyone.
+  var ADMIN_PASSWORD = "refleksi2026";
+
+  // Supabase project config. The anon key is a public, restricted key —
+  // safe to embed in client-side code by design (RLS policies control access).
+  var SUPABASE_URL = "https://yljtgyeehnvhzannknpi.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsanRneWVlaG52aHphbm5rbnBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1Nzk3NTEsImV4cCI6MjA5OTE1NTc1MX0.CA_Cbfm5580kWwmw6kcTDxkgqY2c4IYbtHtkyjWSdXs";
+  var SUPABASE_TABLE = "responses";
+
+  var QUESTIONS = [
+    "Bagaimana kamu mendeskripsikan diriku kepada seseorang yang belum pernah bertemu denganku?",
+    "Apa kesan pertamamu ketika pertama kali kenal diriku?",
+    "Apakah kesan itu berubah setelah mengenalku lebih lama? Ceritakan bagaimana perubahan tersebut terjadi.",
+    "Menurutmu, apa kelebihan terbesar yang kumiliki?",
+    "Apa kekurangan yang paling terlihat dariku?",
+    "Menurutmu, kebiasaan apa yang sebaiknya kuubah?",
+    "Apakah ada sifatku yang menurutmu sering membuat orang lain merasa kurang nyaman?",
+    "Apa blind spot terbesar yang mungkin tidak kusadari tentang diriku sendiri?",
+    "Menurutmu, kapan aku terlihat menjadi versi terbaik dari diriku?",
+    "Dalam situasi apa aku terlihat menjadi versi terburuk dari diriku?",
+    "Apa hal yang paling kamu kenal dariku?",
+    "Apa hal yang menurutmu paling menghambat perkembangan diriku?",
+    "Misal kamu menjadi mentor hidupku selama satu hari, apa tiga nasihat yang akan kamu berikan?",
+    "Jika kamu bisa mengubah satu hal dari diriku, apa yang akan kamu ubah? Mengapa?",
+    "Menurutmu, apa potensi terbesar yang sebenarnya kumiliki tetapi belum kusadari? DAMN DUDE Iki alay banget si wkwkwk tapi isi ae lah ya wkwkwk",
+    "Apa satu hal yang sebaiknya tidak pernah kuubah karena itu adalah bagian terbaik dari diriku?",
+    "Apakah ada sesuatu yang selama ini ingin kamu katakan kepadaku tetapi belum pernah memiliki kesempatan untuk mengatakannya?",
+    "Bayangkan ini adalah kesempatan terakhirmu untuk berbicara kepadaku secara anonim. Tuliskan apa pun yang benar-benar ingin kamu sampaikan, tanpa takut menyinggung perasaanku. Aku ingin mendengar kejujuranmu."
+  ];
+
+  var state = {
+    view: "landing",
+    qIndex: 0,
+    answers: new Array(QUESTIONS.length).fill(""),
+    adminAuthed: false,
+    responses: null,
+    filteredResponses: null,
+    aiResult: "",
+    aiLoading: false
+  };
+
+  var root = document.getElementById("refl-view");
+
+  function el(tag, cls, html){
+    var e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+  function esc(s){
+    return (s || "").replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  // ---------- Supabase helpers ----------
+  async function saveResponse(answers){
+    try{
+      var res = await fetch(SUPABASE_URL + "/rest/v1/" + SUPABASE_TABLE, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ answers: answers })
+      });
+      if(!res.ok){
+        var errText = "";
+        try{ errText = await res.text(); }catch(e2){}
+        console.error("[refleksi] Supabase insert gagal:", res.status, errText);
+        return { ok:false, reason:"http-" + res.status, detail: errText };
+      }
+      console.log("[refleksi] jawaban tersimpan ke Supabase.");
+      return { ok:true };
+    }catch(err){
+      console.error("[refleksi] gagal menyimpan jawaban ke Supabase:", err);
+      return { ok:false, reason:"exception", error: err };
+    }
+  }
+
+  async function loadAllResponses(){
+    try{
+      var res = await fetch(
+        SUPABASE_URL + "/rest/v1/" + SUPABASE_TABLE + "?select=id,created_at,answers&order=created_at.desc",
+        {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": "Bearer " + SUPABASE_ANON_KEY
+          }
+        }
+      );
+      if(!res.ok){
+        console.error("[refleksi] Supabase fetch gagal:", res.status);
+        return [];
+      }
+      var rows = await res.json();
+      return rows.map(function(row){
+        return { timestamp: row.created_at, answers: row.answers };
+      });
+    }catch(e){
+      console.error("[refleksi] gagal memuat jawaban dari Supabase:", e);
+      return [];
+    }
+  }
+
+  // ---------- Render: Landing ----------
+  function renderLanding(){
+    var card = el("div", "r-card");
+    card.appendChild(el("div", "r-eyebrow", "Refleksi &middot; Anonim &middot; ~10 menit"));
+    card.appendChild(el("h1", "r-title", "Help Me See Myself Through Your Eyes"));
+
+    var body = el("p", "r-body-text",
+      esc("yo wassup, mungkin sedikit alay ya tapi boleh ku minta tolong buat ngisi survei ini? survei ini sendiri buat refleksi diriku dan yah ajg alay banget cog wkwk intinya isi sejujur-jujurnya, btw ini bukan brarti aku memiliki penyakit dalam terus bakal wafat dalam beberapa bulan atau ada hal-hal lain, ini murni buat bahan refleksiku sendiri karna ya baru bisa kesampaian sekarang wkwkwk")
+    );
+    card.appendChild(body);
+
+    var note = el("div", "r-note",
+      "<b>Seluruh jawaban bersifat anonim.</b> Aku tidak dapat mengetahui siapa yang mengisinya. Aku hanya berharap kamu menjawab dengan tulus &mdash; baik itu pujian, kritik, maupun saran.<br><br>Terima kasih telah bersedia meluangkan waktumu."
+    );
+    card.appendChild(note);
+
+    var btn = el("button", "r-btn r-btn-primary", "Mulai Menulis &nbsp;&rarr;");
+    btn.style.width = "100%";
+    btn.onclick = function(){
+      state.qIndex = 0;
+      state.answers = new Array(QUESTIONS.length).fill("");
+      state.view = "survey";
+      render();
+    };
+    card.appendChild(btn);
+
+    var footer = el("div", "r-landing-footer");
+    var adminLink = el("button", "r-admin-link", "Admin");
+    adminLink.onclick = function(){ state.view = "admin-login"; render(); };
+    footer.appendChild(adminLink);
+    card.appendChild(footer);
+
+    root.appendChild(card);
+  }
+
+  // ---------- Render: Survey ----------
+  function renderSurvey(){
+    var card = el("div", "r-card");
+    var progressPct = Math.round(((state.qIndex+1)/QUESTIONS.length)*100);
+
+    var progressWrap = el("div", "r-progress-wrap");
+    progressWrap.appendChild(el("div", "r-progress-label", "Pertanyaan " + (state.qIndex+1) + " dari " + QUESTIONS.length));
+    var track = el("div", "r-progress-track");
+    var fill = el("div", "r-progress-fill");
+    fill.style.width = progressPct + "%";
+    track.appendChild(fill);
+    progressWrap.appendChild(track);
+    card.appendChild(progressWrap);
+
+    var qWrap = el("div", "r-q-wrap");
+    qWrap.appendChild(el("h2", "r-q-title", esc(QUESTIONS[state.qIndex])));
+
+    var textarea = el("textarea", "r-textarea");
+    textarea.placeholder = "Tulis jawabanmu di sini...";
+    textarea.value = state.answers[state.qIndex] || "";
+    textarea.oninput = function(){ state.answers[state.qIndex] = textarea.value; };
+    qWrap.appendChild(textarea);
+    qWrap.appendChild(el("div", "r-hint", "Jawaban tidak wajib panjang. Tulis apa adanya."));
+    card.appendChild(qWrap);
+
+    var submitError = el("div", "r-error", "");
+    submitError.style.display = "none";
+
+    var btnRow = el("div", "r-btn-row");
+    var prevBtn = el("button", "r-btn r-btn-ghost", "Sebelumnya");
+    prevBtn.disabled = state.qIndex === 0;
+    prevBtn.onclick = function(){
+      if(state.qIndex > 0){ state.qIndex--; render(); }
+    };
+    var nextBtn = el("button", "r-btn r-btn-primary", state.qIndex === QUESTIONS.length-1 ? "Selesai" : "Selanjutnya");
+    nextBtn.onclick = async function(){
+      if(state.qIndex < QUESTIONS.length-1){
+        state.qIndex++;
+        render();
+      } else {
+        submitError.style.display = "none";
+        nextBtn.disabled = true;
+        nextBtn.textContent = "Mengirim...";
+        var result = await saveResponse(state.answers);
+        if(result && result.ok){
+          state.view = "thanks";
+          render();
+        } else {
+          nextBtn.disabled = false;
+          nextBtn.textContent = "Selesai";
+          submitError.style.display = "block";
+          submitError.textContent = "Jawaban gagal terkirim (kemungkinan koneksi bermasalah atau server sedang tidak bisa diakses). Coba klik \"Selesai\" sekali lagi.";
+        }
+      }
+    };
+    btnRow.appendChild(prevBtn);
+    btnRow.appendChild(nextBtn);
+    card.appendChild(btnRow);
+    card.appendChild(submitError);
+
+    root.appendChild(card);
+  }
+
+  // ---------- Render: Thanks ----------
+  function renderThanks(){
+    var card = el("div", "r-card");
+    card.style.textAlign = "center";
+    card.appendChild(el("div", "r-thanks-icon", "&#10084;&#65039;"));
+    card.appendChild(el("h1", "r-title", "Terima kasih telah bersedia menuliskan pendapatmu."));
+    card.appendChild(el("p", "r-body-text", esc("Kebanyakan tanya, 18 pertanyaan alay wkwkwk, aku dewe merinding waktu bikin ini wkwkwk")));
+    card.appendChild(el("p", "r-body-text", esc("Yah intinya ngunulah, izinkan aku mengutip sebuah quotes dari anime, aku lali si seko anime opo kwkwkw:")));
+    card.appendChild(el("div", "r-quote", esc('"jadilah lebih baik tanpa merasa lebih baik"') + " &mdash; asek HIDUP JOKOWI."));
+    root.appendChild(card);
+  }
+
+  // ---------- Render: Admin login ----------
+  function renderAdminLogin(){
+    var card = el("div", "r-card");
+    var back = el("button", "r-back-link", "&larr; Kembali");
+    back.onclick = function(){ state.view = "landing"; render(); };
+    card.appendChild(back);
+
+    card.appendChild(el("h1", "r-title", "Masuk sebagai Admin"));
+    card.appendChild(el("p", "r-body-text", "Halaman ini hanya untuk pemilik survei."));
+
+    var row = el("div", "r-pw-row");
+    var input = document.createElement("input");
+    input.type = "password";
+    input.placeholder = "Password admin";
+    var btn = el("button", "r-btn r-btn-primary", "Masuk");
+    var errorBox = el("div", "r-error", "");
+
+    function tryLogin(){
+      if(input.value === ADMIN_PASSWORD){
+        state.adminAuthed = true;
+        state.view = "admin";
+        render();
+      } else {
+        errorBox.textContent = "Password salah. Coba lagi.";
+      }
+    }
+    btn.onclick = tryLogin;
+    input.onkeydown = function(e){ if(e.key === "Enter") tryLogin(); };
+
+    row.appendChild(input);
+    row.appendChild(btn);
+    card.appendChild(row);
+    card.appendChild(errorBox);
+
+    root.appendChild(card);
+    setTimeout(function(){ input.focus(); }, 50);
+  }
+
+  // ---------- Admin: export helpers ----------
+  function exportCSV(responses){
+    var headers = ["timestamp"].concat(QUESTIONS.map(function(q,i){ return "Q" + (i+1); }));
+    var rows = [headers];
+    responses.forEach(function(r){
+      var row = [r.timestamp];
+      for(var i=0;i<QUESTIONS.length;i++){
+        row.push(r.answers[i] || "");
+      }
+      rows.push(row);
+    });
+    var csv = rows.map(function(row){
+      return row.map(function(cell){
+        var c = String(cell == null ? "" : cell).replace(/"/g, '""');
+        return '"' + c + '"';
+      }).join(",");
+    }).join("\r\n");
+
+    var blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8;"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "refleksi-jawaban.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportPDF(responses){
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      alert("Fitur export PDF belum siap, coba lagi sesaat lagi.");
+      return;
+    }
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({unit: "pt", format: "a4"});
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var margin = 48;
+    var maxWidth = pageWidth - margin*2;
+    var y = margin;
+
+    function ensureSpace(lineHeight){
+      if(y + lineHeight > doc.internal.pageSize.getHeight() - margin){
+        doc.addPage();
+        y = margin;
+      }
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Refleksi Anonim - Ringkasan Jawaban", margin, y);
+    y += 26;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text("Total responden: " + responses.length, margin, y);
+    doc.setTextColor(0);
+    y += 24;
+
+    responses.forEach(function(r, idx){
+      ensureSpace(20);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("Responden #" + (idx+1) + "  (" + new Date(r.timestamp).toLocaleString() + ")", margin, y);
+      y += 16;
+
+      QUESTIONS.forEach(function(q, qi){
+        var answer = r.answers[qi] || "(tidak dijawab)";
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        var qLines = doc.splitTextToSize((qi+1) + ". " + q, maxWidth);
+        ensureSpace(qLines.length*12 + 4);
+        doc.text(qLines, margin, y);
+        y += qLines.length*12 + 2;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        var aLines = doc.splitTextToSize(answer, maxWidth);
+        ensureSpace(aLines.length*13 + 10);
+        doc.text(aLines, margin, y);
+        y += aLines.length*13 + 12;
+      });
+      y += 10;
+    });
+
+    doc.save("refleksi-jawaban.pdf");
+  }
+
+  // ---------- Admin: AI reflection ----------
+  async function generateAIReflection(responses){
+    if(!responses || responses.length === 0){
+      return "Belum ada jawaban yang masuk untuk dianalisis.";
+    }
+    var transcript = responses.map(function(r, idx){
+      var lines = ["Responden " + (idx+1) + ":"];
+      QUESTIONS.forEach(function(q, qi){
+        var a = (r.answers[qi] || "").trim();
+        if(a) lines.push((qi+1) + ". " + q + "\nJawaban: " + a);
+      });
+      return lines.join("\n");
+    }).join("\n\n---\n\n");
+
+    var systemPrompt = "Kamu membantu menganalisis kumpulan jawaban survei refleksi diri anonim (bahasa Indonesia informal). " +
+      "Buat ringkasan yang hangat, jujur, dan reflektif, dengan struktur berikut menggunakan heading singkat: " +
+      "1) Tema yang paling sering muncul, 2) Kekuatan yang menonjol, 3) Kelemahan/kritik yang berulang, " +
+      "4) Kemungkinan blind spot, 5) Pola menarik lain, 6) Saran pengembangan diri yang konkret. " +
+      "Tulis dalam bahasa Indonesia, nada suportif tapi jujur, hindari klise berlebihan, jangan sebutkan identitas siapapun karena semua anonim.";
+
+    var res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [
+          {role: "user", content: "Berikut kumpulan jawaban survei refleksi diri dari beberapa responden anonim:\n\n" + transcript}
+        ]
+      })
+    });
+    var data = await res.json();
+    if(data && data.content){
+      return data.content.map(function(b){ return b.type === "text" ? b.text : ""; }).join("\n").trim();
+    }
+    return "Maaf, terjadi kendala saat membuat ringkasan. Coba lagi.";
+  }
+
+  // ---------- Render: Admin dashboard ----------
+  function renderAdmin(){
+    var card = el("div", "r-card r-admin-card");
+
+    var header = el("div", "r-admin-header");
+    var titleWrap = el("div");
+    titleWrap.appendChild(el("h1", "r-admin-title", "Dashboard Admin"));
+    titleWrap.appendChild(el("div", "r-admin-sub", "Semua jawaban tersimpan tanpa identitas apapun."));
+    header.appendChild(titleWrap);
+
+    var logout = el("button", "r-back-link", "&larr; Keluar");
+    logout.onclick = function(){ state.adminAuthed = false; state.view = "landing"; render(); };
+    header.appendChild(logout);
+    card.appendChild(header);
+
+    var toolbar = el("div", "r-toolbar");
+    var search = document.createElement("input");
+    search.className = "r-search";
+    search.placeholder = "Cari kata kunci dalam jawaban...";
+    var csvBtn = el("button", "r-btn r-btn-ghost r-btn-sm", "Export CSV");
+    var pdfBtn = el("button", "r-btn r-btn-ghost r-btn-sm", "Export PDF");
+    var aiBtn = el("button", "r-btn r-btn-primary r-btn-sm", "Generate AI Reflection");
+    toolbar.appendChild(search);
+    toolbar.appendChild(csvBtn);
+    toolbar.appendChild(pdfBtn);
+    toolbar.appendChild(aiBtn);
+    card.appendChild(toolbar);
+
+    var listWrap = el("div", "r-response-list");
+    card.appendChild(listWrap);
+
+    var aiBox = el("div", "r-ai-box");
+    aiBox.style.display = "none";
+    card.appendChild(aiBox);
+
+    root.appendChild(card);
+
+    function renderList(responses){
+      listWrap.innerHTML = "";
+      if(!responses || responses.length === 0){
+        listWrap.appendChild(el("div", "r-empty", "Belum ada jawaban yang masuk, atau terjadi masalah koneksi ke database. Cek console browser (F12) untuk detail jika ini tidak sesuai dugaan."));
+        return;
+      }
+      responses.forEach(function(r, idx){
+        var rc = el("div", "r-response-card");
+        var meta = el("div", "r-response-meta");
+        meta.appendChild(el("span", null, "Responden #" + (idx+1)));
+        meta.appendChild(el("span", null, new Date(r.timestamp).toLocaleString()));
+        rc.appendChild(meta);
+        QUESTIONS.forEach(function(q, qi){
+          var a = (r.answers[qi] || "").trim();
+          if(!a) return;
+          var qa = el("div", "r-response-qa");
+          qa.appendChild(el("div", "r-response-q", (qi+1) + ". " + esc(q)));
+          qa.appendChild(el("div", "r-response-a", esc(a)));
+          rc.appendChild(qa);
+        });
+        listWrap.appendChild(rc);
+      });
+    }
+
+    function applySearch(){
+      var term = search.value.trim().toLowerCase();
+      if(!term){
+        state.filteredResponses = state.responses;
+      } else {
+        state.filteredResponses = (state.responses || []).filter(function(r){
+          return r.answers.some(function(a){ return (a || "").toLowerCase().indexOf(term) !== -1; });
+        });
+      }
+      renderList(state.filteredResponses);
+    }
+    search.oninput = applySearch;
+
+    csvBtn.onclick = function(){ exportCSV(state.filteredResponses || state.responses || []); };
+    pdfBtn.onclick = function(){ exportPDF(state.filteredResponses || state.responses || []); };
+    aiBtn.onclick = async function(){
+      aiBox.style.display = "block";
+      aiBox.className = "r-ai-box r-loading";
+      aiBox.textContent = "Sedang membaca seluruh jawaban dan menyusun ringkasan...";
+      aiBtn.disabled = true;
+      try{
+        var result = await generateAIReflection(state.responses || []);
+        aiBox.className = "r-ai-box";
+        aiBox.textContent = result;
+      }catch(e){
+        aiBox.className = "r-ai-box";
+        aiBox.textContent = "Gagal membuat ringkasan AI. Coba lagi.";
+      }
+      aiBtn.disabled = false;
+    };
+
+    listWrap.innerHTML = "";
+    listWrap.appendChild(el("div", "r-empty", "Memuat jawaban..."));
+    loadAllResponses().then(function(responses){
+      state.responses = responses;
+      state.filteredResponses = responses;
+      renderList(responses);
+    });
+  }
+
+  // ---------- Router ----------
+  function render(){
+    root.innerHTML = "";
+    if(state.view === "landing") renderLanding();
+    else if(state.view === "survey") renderSurvey();
+    else if(state.view === "thanks") renderThanks();
+    else if(state.view === "admin-login") renderAdminLogin();
+    else if(state.view === "admin") {
+      if(!state.adminAuthed){ state.view = "admin-login"; renderAdminLogin(); }
+      else renderAdmin();
+    }
+  }
+
+  render();
+})();
+</script>
